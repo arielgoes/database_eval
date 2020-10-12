@@ -20,11 +20,17 @@ Run: python3.7 <\file.py>
 - Setup Postgre to accept TimescaleDB library:  
     "sudo bash"  
     "echo "shared_preload_libraries = 'timescaledb'" >> /etc/postgresql/11/main/postgresql.conf"  
-    -*connect to your database*  
-    "CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;"  
 -Install Psycopg2: "pip install psycopg2-binary"  
 
-
-## OpenTSDB
-
-## Graphite
+Set user postgres:
+1. sudo su -l postgres
+2. psql
+3. \password postgres
+4. 123
+5. CREATE DATABASE ProbeMon;
+6. \c probemon
+7. sudo gedit /etc/postgresql/11/main/postgresql.conf (change "shared_preload_libraries= ''" to "shared_preload_libraries= 'timescaledb'", including at the end of the file)
+8. sudo su -l postgres
+9. psql
+10. \c probemon
+11. CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
