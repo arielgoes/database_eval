@@ -19,8 +19,8 @@ Run: python3.7 <\file.py>
     "sudo apt install timescaledb-postgresql-11"  
 - Setup Postgre to accept TimescaleDB library:  
     "sudo bash"  
-    "echo "shared_preload_libraries = 'timescaledb'" >> /etc/postgresql/11/main/postgresql.conf"  
--Install Psycopg2: "pip install psycopg2-binary"  
+    "echo "shared_preload_libraries = 'timescaledb'" >> /etc/postgresql/11/main/postgresql.conf"
+- Install Psycopg2: "sudo python3.7 -m pip install psycopg2-binary"  
 
 Set user postgres:
 1. sudo su -l postgres
