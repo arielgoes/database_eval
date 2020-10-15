@@ -15,7 +15,6 @@ client.switch_database("ProbeMon")
 
 
 #insert dumb data
-start = int(round(time.time()) * 1000)
 data = []
 
 for i in range(5000): #instant of time
@@ -25,10 +24,11 @@ for i in range(5000): #instant of time
         di_data =   {"measurement": "telemetry_data", 
                     "tags": {"id" : j},
                     "time": int(time.time_ns()) - random.randint(1,9999),
-                    "fields": {"queue_time": 10, "process_time": 100}}
+                    "fields": {"queue_time": random.randint(1, 100), "process_time": random.randint(1,10)}}
         data.append(di_data)                   
-client.write_points(data, batch_size=5000)
 
+start = int(round(time.time()) * 1000)
+client.write_points(data, batch_size=50000)
 end = int(round(time.time()) * 1000)
 print("start: " + str(start))
 print("end: " + str(end))
