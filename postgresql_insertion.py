@@ -47,12 +47,7 @@ class DataBase:
         end = int(round(time.time()) * 1000)
         self.conn.commit()
         cur.close()
-        
-        
-        print("start: " + str(start))
-        print("end: " + str(end))
         print("Total time: " + str(end - start) + "ms")
-
 
     def close_conn(self):
         #close the connection
