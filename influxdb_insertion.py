@@ -24,7 +24,7 @@ for i in range(5000): #instant of time
         di_data =   {"measurement": "telemetry_data", 
                     "tags": {"id" : j},
                     "time": int(time.time_ns()) - random.randint(1,9999),
-                    "fields": {"queue_time": random.randint(1, 100), "process_time": random.randint(1,10)}}
+                    "fields": {"queue_time": random.randint(1, 10), "process_time": random.randint(1,10)}}
         data.append(di_data)                   
 
 start = int(round(time.time()) * 1000)
