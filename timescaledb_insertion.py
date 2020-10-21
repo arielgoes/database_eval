@@ -6,9 +6,18 @@ import pytz
 import time
 from threading import Thread
 from subprocess import check_output
-import subprocess
 
-class DataBase:
+import sys
+import os
+import argparse
+import logging
+import subprocess
+import shlex
+
+DEFAULT_PROBES = 0
+DEFAULT_DEVICES = 0
+
+class DataBase():
     def __init__ (self):
         #connect to the db
         self.conn = pg2.connect(
@@ -18,7 +27,10 @@ class DataBase:
             password = "123")    
 
     # serie temporal - tempo de fila
-    def insertion(self):
+    def insertion(self, p, d):
+
+        print("p: " + str(p) + " d: " + str(d))
+
         #cursor
         cur = self.conn.cursor()
         
@@ -31,8 +43,8 @@ class DataBase:
         query = sql.SQL("create table if not exists telemetry_data (timestamptz TIMESTAMPTZ, device INTEGER not null, queue_time INTEGER not null, process_time INTEGER not null)")
         cur.execute(query)
         data = []
-        for _ in range(5000):
-            for d in range(200):
+        for _ in range(p):
+            for d in range(d):
                 #query = sql.SQL("insert into telemetry_data (timestamptz, device, queue_time, process_time) values (%s, %s, %s, %s)").format(sql.Identifier(table_name))
                 timestamptz = datetime.datetime.now(pytz.timezone('America/Sao_Paulo'))
                 queue_time = random.randrange(1, 100)
@@ -56,14 +68,23 @@ class DataBase:
 
 
 def main():
+
+    parser = argparse.ArgumentParser(description='TimescaleDB run manager')
+    parser.add_argument("--probes", "-p", help="Number of probes", default=None, type=int)
+    parser.add_argument("--devices", "-d", help="Number of devices", default=None, type=int)
+    #parser.add_argument("--batchsize", "-b", help="Batch size", default=DEFAULT_BATCH_SIZE, type=int)
+
+    args = parser.parse_args()
+    
+    #create connection to timescaledb
     db = DataBase()
 
     #queries
-    db.insertion()
+    db.insertion(args.probes, args.devices)
 
 	#close connection
-    #db.close_conn()
+    db.close_conn()
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

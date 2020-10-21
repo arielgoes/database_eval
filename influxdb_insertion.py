@@ -1,8 +1,13 @@
-#!/usr/bin/python3.7
 from influxdb import InfluxDBClient
 import random
 import time
 from datetime import datetime
+
+import sys
+import os
+import argparse
+import logging
+import subprocess
 
 DEFAULT_BATCH_SIZE = 5000
 
@@ -15,30 +20,43 @@ client.create_database("ProbeMon")
 #use recreated database
 client.switch_database("ProbeMon")
 
+#p = # probes; d = # devices; b = batch_size
+def runInfluxDB(p, d, b):
+	#insert dumb data
+	data = []
+	for i in range(p): #number of probes
+		for j in range(d): #number of devices
+			#q_time = random.randint(1, 15) #time in ms
+			#p_time = random.randint(5, 200) #time in ms
+			di_data =   {"measurement": "telemetry_data", 
+						"tags": {"id" : j},
+						"time": int(time.time_ns()) - random.randint(1,9999),
+						"fields": {"queue_time": random.randint(1, 10), "process_time": random.randint(1,10)}}
+			data.append(di_data)
+			
+	start = int(round(time.time()) * 1000)
+	if(b > p*d):
+		print("WARNING: 'batch_size' is too huge, Maximum value is (p * d) = %d, using %d", i*j, DEFAULT_BATCH_SIZE)
+		b = DEFAULT_BATCH_SIZE
+	elif(b <= 0):
+		print("WARNING: 'batch_size' is too small. Mininum value is 1, using %d", DEFAULT_BATCH_SIZE)
+		b = DEFAULT_BATCH_SIZE
+	client.write_points(data, batch_size=b)
+	end = int(round(time.time()) * 1000)
+	print(str(end - start)) #time in 'ms' precision
 
-#insert dumb data
-data = []
+def main():
+	parser = argparse.ArgumentParser(description='InfluxDB insertion script')
+	parser.add_argument("--probes", "-p", help="Number of probes", default=None, type=int)
+	parser.add_argument("--devices", "-d", help="Number of devices", default=None, type=int)
+	parser.add_argument("--batchsize", "-b", help="Batch size", default=DEFAULT_BATCH_SIZE, type=int)
 
-for i in range(5000): #instant of time
-    for j in range(200): #number of devices
-        #q_time = random.randint(1, 15) #time in ms
-        #p_time = random.randint(5, 200) #time in ms
-        di_data =   {"measurement": "telemetry_data", 
-                    "tags": {"id" : j},
-                    "time": int(time.time_ns()) - random.randint(1,9999),
-                    "fields": {"queue_time": random.randint(1, 10), "process_time": random.randint(1,10)}}
-        data.append(di_data)                   
+	args = parser.parse_args()
 
-start = int(round(time.time()) * 1000)
-if(b > i*j):
-    print("BATCH_SIZE TOO LARGE, MAXIMUM VALUE IS (PROBES * DEVICES) = %d, USING %d", i*j, DEFAULT_BATCH_SIZE)
-    b = DEFAULT_BATCH_SIZE
-elif(b <= 0):
-    print("BATCH_SIZE TOO SMALL, MINIMUM VALUE IS 1, USING %d", DEFAULT_BATCH_SIZE)
-    b = DEFAULT_BATCH_SIZE
-client.write_points(data, batch_size=b)
-end = int(round(time.time()) * 1000)
-print("Total time: " + str(end - start) + "ms")
+	runInfluxDB(p=args.probes, d=args.devices, b=args.batchsize)
 
-def if __name__ == "__main__":
-    pass
+	#cmd = "python3.7 influxdb.py " \
+	#	"--count 1 --pairs %d --failure %f --out %s --switches %d "  % (args.pairs, f, outfile, s)
+
+if __name__ == '__main__':
+	sys.exit(main())
