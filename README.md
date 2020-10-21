@@ -3,8 +3,13 @@
 ### InfluxDB
 - Install Python 3.7: "sudo apt install python3.7"
 - Install library InfluxDBClient: "sudo python3.7 -m pip install influxdb"
-
-Run: python3.7 <\file.py>
+- Install InfluxDB latest version:
+    "sudo curl -sL https://repos.influxdata.com/influxdb.key | sudo apt-key add -"  
+    "sudo echo "deb https://repos.influxdata.com/ubuntu bionic stable" | sudo tee /etc/apt/sources.list.d/influxdb.list"  
+    "sudo apt-get update"  
+    "sudo apt-get install influxdb"  
+    "sudo service influxdb start"  
+    "influx"  
 
 ## TimeScaleDB
 - Install Python 3.7: "sudo apt install python3.7"  

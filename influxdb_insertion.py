@@ -4,6 +4,8 @@ import random
 import time
 from datetime import datetime
 
+DEFAULT_BATCH_SIZE = 5000
+
 client = InfluxDBClient(host='localhost', port=8086)
 
 #overwrites old database
@@ -28,6 +30,15 @@ for i in range(5000): #instant of time
         data.append(di_data)                   
 
 start = int(round(time.time()) * 1000)
-client.write_points(data, batch_size=50000)
+if(b > i*j):
+    print("BATCH_SIZE TOO LARGE, MAXIMUM VALUE IS (PROBES * DEVICES) = %d, USING %d", i*j, DEFAULT_BATCH_SIZE)
+    b = DEFAULT_BATCH_SIZE
+elif(b <= 0):
+    print("BATCH_SIZE TOO SMALL, MINIMUM VALUE IS 1, USING %d", DEFAULT_BATCH_SIZE)
+    b = DEFAULT_BATCH_SIZE
+client.write_points(data, batch_size=b)
 end = int(round(time.time()) * 1000)
 print("Total time: " + str(end - start) + "ms")
+
+def if __name__ == "__main__":
+    pass
