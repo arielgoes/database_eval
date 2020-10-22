@@ -35,21 +35,23 @@ def insertion(p, d, b):
 			
 	start = int(round(time.time()) * 1000)
 	if(b > p*d):
-		print("WARNING: 'batch_size' is too huge, Maximum value is (p * d) = %d, using %d", i*j, DEFAULT_BATCH_SIZE)
+		print("WARNING: 'batch_size' is too huge, Maximum value is (p * d) = %d, using %d", (i*j), DEFAULT_BATCH_SIZE)
 		b = DEFAULT_BATCH_SIZE
 	elif(b <= 0):
 		print("WARNING: 'batch_size' is too small. Mininum value is 1, using %d", DEFAULT_BATCH_SIZE)
 		b = DEFAULT_BATCH_SIZE
 	client.write_points(data, batch_size=b)
 	end = int(round(time.time()) * 1000)
-	print("Insertion time: " + str(end - start) + "ms") #time in 'ms' precision
+	#print("Insertion time: " + str(end - start) + "ms") #time in 'ms' precision
+	return (end - start)
 
 
 def deletion(d):
 	start = int(round(time.time()) * 1000)
 	client.delete_series(database='ProbeMon', measurement='telemetry_data')
 	end = int(round(time.time()) * 1000)
-	print("Deletion time: " + str(end - start) + "ms") #time in 'ms' precision	
+	#print("Deletion time: " + str(end - start) + "ms") #time in 'ms' precision
+	return (end - start)
 
 
 def main():
@@ -60,11 +62,19 @@ def main():
 
 	args = parser.parse_args()
 
-	insertion(p=args.probes, d=args.devices, b=args.batchsize)
-	deletion(d=args.devices)
+	#query insert
+	time_insert = insertion(p=args.probes, d=args.devices, b=args.batchsize)
 
-	#cmd = "python3.7 influxdb.py " \
-	#	"--count 1 --pairs %d --failure %f --out %s --switches %d "  % (args.pairs, f, outfile, s)
+	#query select count total insertions
+	total_count = client.query('SELECT COUNT("process_time") FROM "telemetry_data";')#.items();
+	total_count = list(total_count.get_points(measurement='telemetry_data'))
+	total_count = total_count[0]['count']
+
+	time_delete = deletion(d=args.devices)
+
+	print("InfluxDB" + ";" + str(args.probes) + ";" + str(args.devices) + ";" + str(total_count) + ";" +
+		str(time_insert) + ";" + str(time_delete) + ";" + str(args.batchsize))
+	#PROBES;DEVICES;TOTAL_INSERTIONS;INSERTION_TIME;DELETION_TIME;BATCH_SIZE (InfluxDB)
 
 if __name__ == '__main__':
 	sys.exit(main())

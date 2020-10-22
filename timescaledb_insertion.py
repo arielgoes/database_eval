@@ -61,7 +61,19 @@ class DataBase():
 		end = int(round(time.time()) * 1000)
 		self.conn.commit()
 		cur.close()
-		print("Insertion: " + str(end - start) + "ms")
+		#print("Insertion: " + str(end - start) + "ms")
+		return (end - start)
+
+
+	#counts how many insertions were succesfull
+	def count_insertion(self):
+		cur =  self.conn.cursor()
+		cur.execute("SELECT COUNT(*) FROM \"telemetry_data\";")
+		total_count = list(cur.fetchone())
+		total_count = total_count[0]
+		self.conn.commit()
+		cur.close()
+		return total_count
 
 
 	def deletion(self):
@@ -71,8 +83,8 @@ class DataBase():
 		end = int(round(time.time()) * 1000)
 		self.conn.commit()
 		cur.close()
-		print("Deletion: " + str(end - start) + "ms")
-
+		#print("Deletion: " + str(end - start) + "ms")
+		return (end - start)
 
 	def close_conn(self):
 		#close the connection
@@ -90,12 +102,21 @@ def main():
 	#create connection to timescaledb
 	db = DataBase(p=args.probes, d=args.devices)
 
-	#queries
-	db.insertion(args.probes, args.devices)
-	#db.deletion()
+	#insert
+	time_insert = db.insertion(args.probes, args.devices)
+
+	#query count
+	total_count = db.count_insertion()
+
+	#delete all
+	time_delete = db.deletion()
 
 	#close connection
 	db.close_conn()
+
+	print("TimescaleDB" + ";" + str(args.probes) + ";" + str(args.devices) + ";" + str(total_count) + ";" +
+		str(time_insert) + ";" + str(time_delete) + ";" + "X")
+	#PROBES;DEVICES;total_count;INSERTION_TIME;DELETION_TIME;X (TimescaleDB)
 
 
 if __name__ == "__main__":
