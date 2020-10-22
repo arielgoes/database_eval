@@ -1,57 +1,34 @@
 #!/bin/bash
 
-echo "Choose the DBMS to run experiments, then press [ENTER]"
-echo "[1] InfluxDB -- [2] TimescaleDB -- [3] PostgreSQL"
-read RUN
+echo "Insertions = <probes> * <devices>"
+echo "Usage: <repetitions> <batch_size> <probes> <devices>"
+read N BATCH_SIZE PROBES DEVICES
 
-if [[ $RUN -le 0 || $RUN -ge 4 ]]; then
-	echo "ERROR: Invalid option! (case)"
+if [[ $N -le 0 || $PROBES -le 0 || $DEVICES -le 0 ]]; then
+	echo "Usage: <N>, <probes> and <devices> must be greater than 0"
 	exit 1
 fi
 
-echo "How many times you want to run it? NOTE: N > 0"
-read N
-
-if [[ $N -le 0 ]]; then
-	echo "N must be greater than 0"
-	exit 1
-fi
-
-echo "Available parameters: -p [Number of Probes], -d [Number of Devices] -b [Batch Size (InfluxDB)]"
-read -p "Enter values in respective order (-p -d -b):" PROBES DEVICES BATCHSIZE
-
-if [[ $((PROBES*DEVICES)) -lt 1000 ]]; then
-	echo "p * d must be >= 1000"
-	exit 1
-fi
-
-case $RUN in
-	1)
-		echo "[1] InfluxDB (case)"
-		for((i=0;i<N;i++)); do
-			echo "Execution #" $i
-			for((j=1000;j<=$((PROBES*DEVICES));j*=10)); do
-				python3.7 run_influxdb.py -p $PROBES -d $DEVICES -b $BATCHSIZE
-			done
+for((j=10;j<=$PROBES;j*=10)); do
+	for((k=10;k<=$DEVICES;k*=10)); do
+		for((i=0;i<$N;i++)); do
+			#echo "Execution #" $i
+			python3.7 run_timescaledb.py -p $j -d $k
 		done
-	;;
-	2)
-		echo "[2] TimescaleDB (case)"
-		for((i=0;i<N;i++)); do
-			for((j=1000;j<=$((PROBES*DEVICES));j*=10)); do
-				python3.7 run_timescaledb.py -p $PROBES -d $DEVICES
-			done
+	done
+done
+
+for((j=10;j<=$PROBES;j*=10)); do
+	for((k=10;k<=$DEVICES;k*=10)); do
+		for((i=0;i<$N;i++)); do
+			#echo "Execution #" $i
+			python3.7 run_influxdb.py -p $j -d $k -b $BATCH_SIZE
 		done
-	;;
-	3)
-		for((i=0;i<N;i++)); do
-			echo "[3] PostgreSQL (case)"
-		done
-	;;
-	*)
-		echo "ERROR: Invalid option! (case)"
-	;;
-esac
+	done
+done
+
+
+
 
 #PROBES;DEVICES;TOTAL_INSERTIONS;INSERTION_TIME;DELETION_TIME;BATCH_SIZE (InfluxDB)
 #PROBES;DEVICES;TOTAL_INSERTIONS;INSERTION_TIME;DELETION_TIME;X (TimescaleDB)

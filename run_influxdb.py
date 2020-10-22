@@ -20,8 +20,17 @@ def main():
 
 	args = parser.parse_args()
 
+	batch_size = args.batchsize
+
+	if(batch_size > args.probes*args.devices):
+		#print("WARNING: 'batch_size' is too huge, Maximum value is (p * d) = %d, using %d", (i*j), DEFAULT_BATCH_SIZE)
+		batch_size = DEFAULT_BATCH_SIZE
+	elif(batch_size <= 0):
+		#print("WARNING: 'batch_size' is too small. Mininum value is 1, using %d", DEFAULT_BATCH_SIZE)
+		batch_size = DEFAULT_BATCH_SIZE
+
 	cmd = "python3.7 influxdb_insertion.py" \
-	" --probes %d --devices %d --batchsize %d" % (args.probes, args.devices, args.batchsize)
+	" --probes %d --devices %d --batchsize %d" % (args.probes, args.devices, batch_size)
 
 	param = shlex.split(cmd)
 	subprocess.call(param)

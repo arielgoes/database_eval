@@ -56,13 +56,13 @@ class DataBase():
 				row = [timestamptz, self.d, queue_time, process_time]
 				data.append(row)
 		args_str = ','.join(cur.mogrify("(%s,%s,%s,%s)", x).decode("utf-8") for x in data)
-		start = int(round(time.time()) * 1000)
+		start = time.time() * 1000
 		cur.execute("INSERT INTO telemetry_data VALUES " + args_str)
-		end = int(round(time.time()) * 1000)
+		end = time.time() * 1000 
 		self.conn.commit()
 		cur.close()
 		#print("Insertion: " + str(end - start) + "ms")
-		return (end - start)
+		return (end - start) #time in ms
 
 
 	#counts how many insertions were succesfull
@@ -76,15 +76,27 @@ class DataBase():
 		return total_count
 
 
+	def getDevice(self):
+		cur = self.conn.cursor()
+		start = time.time() * 1000
+		cur.execute("SELECT device FROM telemetry_data WHERE device = '1';")
+		print(cur.fetchall())
+		end = time.time() * 1000
+		self.conn.commit()
+		cur.close()
+		return (end - start)
+		
+		return (end - start)
+
 	def deletion(self):
 		cur = self.conn.cursor()
-		start = int(round(time.time()) * 1000)
-		cur.execute("DELETE FROM telemetry_data")
-		end = int(round(time.time()) * 1000)
+		start = time.time() * 1000
+		cur.execute("DELETE FROM telemetry_data;")
+		end = time.time() * 1000
 		self.conn.commit()
 		cur.close()
 		#print("Deletion: " + str(end - start) + "ms")
-		return (end - start)
+		return (end - start) #time in ms
 
 	def close_conn(self):
 		#close the connection
@@ -108,6 +120,9 @@ def main():
 	#query count
 	total_count = db.count_insertion()
 
+	#query get device
+	time_get_device = db.getDevice()
+
 	#delete all
 	time_delete = db.deletion()
 
@@ -115,8 +130,8 @@ def main():
 	db.close_conn()
 
 	print("TimescaleDB" + ";" + str(args.probes) + ";" + str(args.devices) + ";" + str(total_count) + ";" +
-		str(time_insert) + ";" + str(time_delete) + ";" + "X")
-	#PROBES;DEVICES;total_count;INSERTION_TIME;DELETION_TIME;X (TimescaleDB)
+		str(time_insert) + ";" + str(time_delete) + ";" + str(time_get_device) + ";" + "X")
+	#PROBES;DEVICES;total_count;INSERTION_TIME;DELETION_TIME;GET_DEVICE;BATCH_SIZE(X) (TimescaleDB)
 
 
 if __name__ == "__main__":

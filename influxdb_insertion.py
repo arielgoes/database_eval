@@ -33,25 +33,25 @@ def insertion(p, d, b):
 						"fields": {"queue_time": random.randint(1, 10), "process_time": random.randint(1,10)}}
 			data.append(di_data)
 			
-	start = int(round(time.time()) * 1000)
-	if(b > p*d):
-		print("WARNING: 'batch_size' is too huge, Maximum value is (p * d) = %d, using %d", (i*j), DEFAULT_BATCH_SIZE)
-		b = DEFAULT_BATCH_SIZE
-	elif(b <= 0):
-		print("WARNING: 'batch_size' is too small. Mininum value is 1, using %d", DEFAULT_BATCH_SIZE)
-		b = DEFAULT_BATCH_SIZE
+	start = time.time() * 1000
 	client.write_points(data, batch_size=b)
-	end = int(round(time.time()) * 1000)
+	end = time.time() * 1000
 	#print("Insertion time: " + str(end - start) + "ms") #time in 'ms' precision
-	return (end - start)
+	return (end - start) #time in ms
 
+
+def getDevice():
+	start = time.time() * 1000
+	client.query('SELECT * FROM telemetry_data WHERE id=\'0\'')
+	end = time.time() * 1000
+	return (end - start)
 
 def deletion(d):
-	start = int(round(time.time()) * 1000)
+	start = time.time() * 1000
 	client.delete_series(database='ProbeMon', measurement='telemetry_data')
-	end = int(round(time.time()) * 1000)
+	end = time.time() * 1000
 	#print("Deletion time: " + str(end - start) + "ms") #time in 'ms' precision
-	return (end - start)
+	return (end - start) #time in ms
 
 
 def main():
@@ -70,11 +70,14 @@ def main():
 	total_count = list(total_count.get_points(measurement='telemetry_data'))
 	total_count = total_count[0]['count']
 
+	#query to get device
+	time_get_device = getDevice()
+
 	time_delete = deletion(d=args.devices)
 
 	print("InfluxDB" + ";" + str(args.probes) + ";" + str(args.devices) + ";" + str(total_count) + ";" +
-		str(time_insert) + ";" + str(time_delete) + ";" + str(args.batchsize))
-	#PROBES;DEVICES;TOTAL_INSERTIONS;INSERTION_TIME;DELETION_TIME;BATCH_SIZE (InfluxDB)
+		str(time_insert) + ";" + str(time_delete) + ";" + str(time_get_device) + ";" + str(args.batchsize))
+	#PROBES;DEVICES;TOTAL_INSERTIONS;INSERTION_TIME;DELETION_TIME;GET_DEVICE;BATCH_SIZE (InfluxDB)
 
 if __name__ == '__main__':
 	sys.exit(main())
