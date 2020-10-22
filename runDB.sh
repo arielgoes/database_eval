@@ -38,7 +38,9 @@ case $RUN in
 	2)
 		echo "[2] TimescaleDB (case)"
 		for((i=0;i<N;i++)); do
-			python3.7 run_timescaledb.py -p $PROBES -d $DEVICES
+			for((j=1000;j<=$((PROBES*DEVICES));j*=10)); do
+				python3.7 run_timescaledb.py -p $PROBES -d $DEVICES
+			done
 		done
 	;;
 	3)
