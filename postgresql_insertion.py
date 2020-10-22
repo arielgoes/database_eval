@@ -30,6 +30,7 @@ class DataBase:
         cur.execute(query)
         query = sql.SQL("create table if not exists telemetry_data (timestamptz TIMESTAMPTZ, device INTEGER not null, queue_time INTEGER not null, process_time INTEGER not null)")
         cur.execute(query)
+        id=0
         data = []
         for _ in range(5000):
             for d in range(200):
@@ -40,6 +41,7 @@ class DataBase:
                 tup = (timestamptz, d, queue_time, process_time)
                 data.append(tup)
                 #cur.execute(query, (timestamptz, d, queue_time, process_time))
+                id+=1
         
         args_str = ','.join(cur.mogrify("(%s,%s,%s,%s)", x).decode("utf-8") for x in data)
         start = int(round(time.time()) * 1000)

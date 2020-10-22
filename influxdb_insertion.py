@@ -21,8 +21,7 @@ client.create_database("ProbeMon")
 client.switch_database("ProbeMon")
 
 #p = # probes; d = # devices; b = batch_size
-def runInfluxDB(p, d, b):
-	#insert dumb data
+def insertion(p, d, b):
 	data = []
 	for i in range(p): #number of probes
 		for j in range(d): #number of devices
@@ -43,7 +42,15 @@ def runInfluxDB(p, d, b):
 		b = DEFAULT_BATCH_SIZE
 	client.write_points(data, batch_size=b)
 	end = int(round(time.time()) * 1000)
-	print(str(end - start)) #time in 'ms' precision
+	print("Insertion time: " + str(end - start) + "ms") #time in 'ms' precision
+
+
+def deletion(d):
+	start = int(round(time.time()) * 1000)
+	client.delete_series(database='ProbeMon', measurement='telemetry_data')
+	end = int(round(time.time()) * 1000)
+	print("Deletion time: " + str(end - start) + "ms") #time in 'ms' precision	
+
 
 def main():
 	parser = argparse.ArgumentParser(description='InfluxDB insertion script')
@@ -53,7 +60,8 @@ def main():
 
 	args = parser.parse_args()
 
-	runInfluxDB(p=args.probes, d=args.devices, b=args.batchsize)
+	insertion(p=args.probes, d=args.devices, b=args.batchsize)
+	deletion(d=args.devices)
 
 	#cmd = "python3.7 influxdb.py " \
 	#	"--count 1 --pairs %d --failure %f --out %s --switches %d "  % (args.pairs, f, outfile, s)
