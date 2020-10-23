@@ -6,7 +6,7 @@ set output 'graph1-AvgDB_avgGetDev.eps'
 set style data histogram
 set xlabel '# of Rows' font "Times-Roman,42" 
 set ylabel 'Time (ms)' font ",42"
-set size 1.2, 1.0
+set size 1.5, 1.0
 set grid ytics
 set style data histogram
 set style histogram cluster gap 1
