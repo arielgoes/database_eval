@@ -15,15 +15,19 @@ import subprocess
 import shlex
 
 
+DEFAULT_BATCH_SIZE = 5000
+DEFAULT_DEVICES = 200
+DEFAULT_PROBES = 5
+
 def main():
 	parser = argparse.ArgumentParser(description='TimescaleDB run manager')
-	parser.add_argument("--probes", "-p", help="Number of probes", default=None, type=int)
-	parser.add_argument("--devices", "-d", help="Number of devices", default=None, type=int)
+	parser.add_argument("--probes", "-p", help="Number of probes", default=DEFAULT_PROBES, type=int)
+	parser.add_argument("--devices", "-d", help="Number of devices", default=DEFAULT_DEVICES, type=int)
 	#parser.add_argument("--batchsize", "-b", help="Batch size", default=DEFAULT_BATCH_SIZE, type=int)
 
 	parser = argparse.ArgumentParser(description='TimescaleDB run manager')
-	parser.add_argument("--probes", "-p", help="Number of probes", default=None, type=int)
-	parser.add_argument("--devices", "-d", help="Number of devices", default=None, type=int)
+	parser.add_argument("--probes", "-p", help="Number of probes", default=DEFAULT_PROBES, type=int)
+	parser.add_argument("--devices", "-d", help="Number of devices", default=DEFAULT_DEVICES, type=int)
 	#parser.add_argument("--batchsize", "-b", help="Batch size", default=DEFAULT_BATCH_SIZE, type=int)
 
 	args = parser.parse_args()

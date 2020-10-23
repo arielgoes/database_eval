@@ -13,8 +13,8 @@ import logging
 import subprocess
 import shlex
 
-DEFAULT_PROBES = 0
-DEFAULT_DEVICES = 0
+DEFAULT_PROBES = 5
+DEFAULT_DEVICES = 200
 
 class DataBase():
 	def __init__ (self, p=DEFAULT_PROBES, d=DEFAULT_DEVICES):
@@ -80,12 +80,9 @@ class DataBase():
 		cur = self.conn.cursor()
 		start = time.time() * 1000
 		cur.execute("SELECT device FROM telemetry_data WHERE device = '1';")
-		print(cur.fetchall())
 		end = time.time() * 1000
 		self.conn.commit()
 		cur.close()
-		return (end - start)
-		
 		return (end - start)
 
 	def deletion(self):
@@ -105,17 +102,17 @@ class DataBase():
 
 def main():
 	parser = argparse.ArgumentParser(description='TimescaleDB run manager')
-	parser.add_argument("--probes", "-p", help="Number of probes", default=None, type=int)
-	parser.add_argument("--devices", "-d", help="Number of devices", default=None, type=int)
+	parser.add_argument("--probes", "-p", help="Number of probes", default=DEFAULT_PROBES, type=int)
+	parser.add_argument("--devices", "-d", help="Number of devices", default=DEFAULT_DEVICES, type=int)
 	#parser.add_argument("--batchsize", "-b", help="Batch size", default=DEFAULT_BATCH_SIZE, type=int)
 
 	args = parser.parse_args()
 	
 	#create connection to timescaledb
-	db = DataBase(p=args.probes, d=args.devices)
+	db = DataBase(p=args.probes, d=DEFAULT_DEVICES)
 
 	#insert
-	time_insert = db.insertion(args.probes, args.devices)
+	time_insert = db.insertion(args.probes, DEFAULT_DEVICES)
 
 	#query count
 	total_count = db.count_insertion()
@@ -129,8 +126,7 @@ def main():
 	#close connection
 	db.close_conn()
 
-	print("TimescaleDB" + ";" + str(args.probes) + ";" + str(args.devices) + ";" + str(total_count) + ";" +
-		str(time_insert) + ";" + str(time_delete) + ";" + str(time_get_device) + ";" + "X")
+	print("TimescaleDB" + ";" + str(total_count) + ";" + str(time_insert) + ";" + str(time_delete) + ";" + str(time_get_device) + ";" + "X")
 	#PROBES;DEVICES;total_count;INSERTION_TIME;DELETION_TIME;GET_DEVICE;BATCH_SIZE(X) (TimescaleDB)
 
 

@@ -10,6 +10,8 @@ import logging
 import subprocess
 
 DEFAULT_BATCH_SIZE = 5000
+DEFAULT_DEVICES = 200
+DEFAULT_PROBES = 5
 
 client = InfluxDBClient(host='localhost', port=8086)
 
@@ -56,14 +58,14 @@ def deletion(d):
 
 def main():
 	parser = argparse.ArgumentParser(description='InfluxDB insertion script')
-	parser.add_argument("--probes", "-p", help="Number of probes", default=None, type=int)
-	parser.add_argument("--devices", "-d", help="Number of devices", default=None, type=int)
+	parser.add_argument("--probes", "-p", help="Number of probes", default=DEFAULT_PROBES, type=int)
+	parser.add_argument("--devices", "-d", help="Number of devices", default=DEFAULT_DEVICES, type=int)
 	parser.add_argument("--batchsize", "-b", help="Batch size", default=DEFAULT_BATCH_SIZE, type=int)
 
 	args = parser.parse_args()
 
 	#query insert
-	time_insert = insertion(p=args.probes, d=args.devices, b=args.batchsize)
+	time_insert = insertion(p=args.probes, d=DEFAULT_DEVICES, b=args.batchsize)
 
 	#query select count total insertions
 	total_count = client.query('SELECT COUNT("process_time") FROM "telemetry_data";')#.items();
@@ -75,8 +77,7 @@ def main():
 
 	time_delete = deletion(d=args.devices)
 
-	print("InfluxDB" + ";" + str(args.probes) + ";" + str(args.devices) + ";" + str(total_count) + ";" +
-		str(time_insert) + ";" + str(time_delete) + ";" + str(time_get_device) + ";" + str(args.batchsize))
+	print("InfluxDB" + ";" + str(total_count) + ";" + str(time_insert) + ";" + str(time_delete) + ";" + str(time_get_device) + ";" + str(args.batchsize))
 	#PROBES;DEVICES;TOTAL_INSERTIONS;INSERTION_TIME;DELETION_TIME;GET_DEVICE;BATCH_SIZE (InfluxDB)
 
 if __name__ == '__main__':
