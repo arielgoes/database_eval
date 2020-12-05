@@ -30,7 +30,7 @@ def insertion(p, d, b):
 			#q_time = random.randint(1, 15) #time in ms
 			#p_time = random.randint(5, 200) #time in ms
 			di_data =   {"measurement": "telemetry_data", 
-						"tags": {"id" : j},
+						"tags": {"device" : j},
 						"time": int(time.time_ns()) - random.randint(1,9999),
 						"fields": {"queue_time": random.randint(1, 10), "process_time": random.randint(1,10)}}
 			data.append(di_data)
@@ -44,7 +44,7 @@ def insertion(p, d, b):
 
 def getDevice():
 	start = time.time() * 1000
-	client.query('SELECT * FROM telemetry_data WHERE id=\'0\'')
+	client.query('SELECT * FROM telemetry_data WHERE device=\'0\'')
 	end = time.time() * 1000
 	return (end - start)
 
